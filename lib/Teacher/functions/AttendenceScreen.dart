@@ -206,6 +206,7 @@ class _AttendencePageState extends State<AttendencePage> {
 
         try {
           list.add(Timestamp.now());
+          list .add(Timestamp.now());
         } catch (e) {
           list = new List();
           list.add(Timestamp.now());
