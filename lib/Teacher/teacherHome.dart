@@ -160,7 +160,8 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
                       : ChatPage()),
             )
           ],
-        ));
+        )
+    );
   }
 
   teacherDashBoard(Map<String, dynamic> map) {
@@ -562,7 +563,7 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
           pref.setInt(document.documentID, not);
           Navigator.push(context, MaterialPageRoute(
               builder: (context) =>
-                  ChatScreen(docId: document.documentID, id: id,)
+                  ChatScreen(classId: document.documentID, id: id,)
           ));
         },
       ),

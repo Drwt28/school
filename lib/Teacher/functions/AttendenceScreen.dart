@@ -207,6 +207,20 @@ class _AttendencePageState extends State<AttendencePage> {
 //  },
 //  )
 
+  var month = [
+    'JAN',
+    'FEB',
+    'MAR',
+    'APR',
+    "MAY",
+    'JUN',
+    'JUL',
+    'AUG',
+    'SEP',
+    'OCT',
+    'NOV',
+    "DEC"
+  ];
   updateAttendece(String schoolid, List<DocumentSnapshot> snap,
       String classId) {
     var db = Firestore.instance.collection('schools/$schoolid/students');
@@ -240,7 +254,10 @@ class _AttendencePageState extends State<AttendencePage> {
 
     Map<String, int> map = Map.from(widget.map);
 
-    map[CustomWidgets.getTimeFromString(DateTime.now())] =
+    var d = DateTime.now();
+    String date = d.day.toString() + "\t" + month[d.month - 1];
+
+    map[date] =
         presentList.length;
     Firestore.instance
         .document('schools/$schoolid/classes/$classId')

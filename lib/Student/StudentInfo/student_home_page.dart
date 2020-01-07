@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import 'package:school_magna/Teacher/TeacherChatPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -48,43 +49,41 @@ class _HomePageState extends State<HomePage> {
                 child: ListView(
                   scrollDirection: Axis.vertical,
                   children: <Widget>[
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
-
                         SizedBox(
                           height: 40,
                           width: 40,
                           child: Image(
-                            image: AssetImage('assets/teacher/student.png'),
+                            image:
+                            AssetImage('assets/teacher/student.png'),
                           ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          snapshot.data.data['name'],
+                          style: TextStyle(fontSize: 25),
                         )
-                        ,
-                        SizedBox(width: 10,)
-                        ,
-                        Text(snapshot.data.data['name'],
-                          style: TextStyle(fontSize: 25),)
                       ],
-                    )
-                    ,
+                    ),
                     ListTile(
                         title: Container(
                           width: 50,
                           height: 50,
-
                         ),
                         subtitle: Column(
                           children: <Widget>[
                             buildDashText('Class Teacher:', classTeacher),
+                            buildDashText('Class :', className),
                             buildDashText("Roll No :",
                                 snapshot.data.data['rollNo']),
-
                             buildDashText("Father's Name :",
                                 snapshot.data.data['fName']),
                             buildDashText("Mother's Name :",
                                 snapshot.data.data['mName']),
-
                           ],
                         )),
                     Card(
@@ -107,35 +106,24 @@ class _HomePageState extends State<HomePage> {
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                          borderRadius: BorderRadius.circular(5)
+                      ),
                       child: ListTile(
-                        dense: true,
-                        title: Text(
-                          'Remarks',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.indigo),
-                        ),
-                        subtitle: Text(
-                          snapshot.data.data['remark'].toString(),
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.indigo),
-                        ),
-                        trailing: FlatButton(
-                          textColor: Colors.indigo,
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                          onPressed: () {
-                            _settingModalBottomSheet(context);
-                          },
-                          child: Text('Reply'),
-                        ),
+                        leading: SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: Image(
+                            image:
+                            AssetImage('assets/teacher/teacher.png'),
+                          ),
+                        ), title: Text('Chat With Class Teacher'),
+                        subtitle: Text('tap to see remarks'),
+                        onTap: () {
+
+                        },
                       ),
                     ),
+
                     SizedBox(
                       height: 10,
                     ),

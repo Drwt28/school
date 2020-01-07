@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:school_magna/Teacher/TeacherChatPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateChatListPage extends StatefulWidget {
@@ -19,7 +20,7 @@ class _CreateChatListPageState extends State<CreateChatListPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Char List'),
+        title: Text('Create New Chat'),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance
@@ -46,14 +47,25 @@ class _CreateChatListPageState extends State<CreateChatListPage> {
             ));
   }
 
+
   void createChatDocument(
       String documentID, String principalId, String schoolId) {
     String id = documentID;
     DocumentReference ref =
-        Firestore.instance.document('schools/$schoolId/Chat/$id');
+    Firestore.instance.document('schools/$schoolId/chat/$documentID');
+    print(documentID);
+    print(principalId);
 
-    List<String> users = [documentID, principalId];
+    List<String> users = [principalId, documentID];
 
-    ref.setData(({'users': users})).then((val) => print('done'));
+    ref
+        .setData(({'users': users, 'count': 0}))
+        .then((val) => print('done'))
+        .then((val) {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ChatScreen(classId: id, id: id)));
+    });
   }
 }

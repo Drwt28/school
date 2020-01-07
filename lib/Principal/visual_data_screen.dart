@@ -1,12 +1,22 @@
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //student class
 class Attendence {
-  final String month;
-  final int number;
+//  final String week;
+//  final int number;
+//  Attendence(this.month, this.number);
+  Attendence({this.week, this.number});
 
-  Attendence(this.month, this.number);
+  Attendence.fromMap(Map<String, dynamic> dataMap)
+      : week = dataMap['attendenceList'],
+        number = dataMap['attendenceList'];
+  final String week;
+  final int number;
 }
 
 class Visualization extends StatefulWidget {
@@ -15,24 +25,56 @@ class Visualization extends StatefulWidget {
 }
 
 class _VisualizationState extends State<Visualization> {
-  final data = [
-    Attendence('Mon', 25),
-    Attendence('Tue', 26),
-    Attendence('Wen', 24),
-    Attendence('Thur', 10),
-    Attendence('Fri', 40),
-    Attendence('Sat', 20)
-  ];
+  final data = [];
   int _value = 1;
+  List<List<Attendence>> list = new List<List<Attendence>>();
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ListView(
-        children: <Widget>[
-          buildClassClip(),
-          data.isEmpty
-              ? Container(
+    var pref = Provider.of<SharedPreferences>(context);
+    String id = pref.get('school');
+    return StreamBuilder<QuerySnapshot>(
+        stream:
+        Firestore.instance.collection('schools/$id/classes').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            for (int index = 0;
+            index < snapshot.data.documents.length;
+            index++) {
+              DocumentSnapshot documentSnapshot =
+              snapshot.data.documents[index];
+              list.add(getDataFromMap(documentSnapshot.data['attendenceList']));
+            }
+          }
+          return Center(
+            child: ListView(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 1,
+                      child: RotationTransition(
+                        turns: AlwaysStoppedAnimation(-45 / 360),
+                        child: Text(
+                          "Class",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 28.0,
+                              color: Colors.indigo),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Container(
+                        child: buildClassClip(),
+                      ),
+                    )
+                  ],
+                ),
+                data.isEmpty
+                    ? Container(
                   padding: EdgeInsets.symmetric(
                     vertical: 60.0,
                   ),
@@ -44,10 +86,11 @@ class _VisualizationState extends State<Visualization> {
                     ),
                   ),
                 )
-              : buildCard(context),
-        ],
-      ),
-    );
+                    : buildCard(context),
+              ],
+            ),
+          );
+        });
   }
 
   Card buildCard(BuildContext context) {
@@ -73,15 +116,20 @@ class _VisualizationState extends State<Visualization> {
 
   Wrap buildClassClip() {
     return Wrap(
+      direction: Axis.horizontal,
+      spacing: 8.0,
+      runAlignment: WrapAlignment.end,
       children: List<Widget>.generate(
         12,
-        (int index) {
+            (int index) {
           return FilterChip(
-            label: Text('Class${index + 1}'),
+            autofocus: true,
+            selectedColor: Colors.indigoAccent,
+            label: Text('${index + 1}'),
             selected: _value == index,
             onSelected: (bool selected) {
               setState(() {
-                _value = selected ? index : null;
+                _value = selected ? index : index;
               });
             },
           );
@@ -95,9 +143,36 @@ class _VisualizationState extends State<Visualization> {
       charts.Series<Attendence, String>(
           id: 'StudentAttendence',
           colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-          domainFn: (Attendence dataPoint, _) => dataPoint.month,
+          domainFn: (Attendence dataPoint, _) => dataPoint.week.toString(),
           measureFn: (Attendence dataPoint, _) => dataPoint.number,
           data: data)
     ];
+  }
+
+  List<Attendence> getDataFromMap(Map map) {
+    List<Attendence> attendence = [];
+    String s = map.toString();
+    int i = map.toString().indexOf(',');
+    while (i > 0) {
+      try {
+        String l = s.substring(0, i);
+        attendence.add(Attendence(
+            week: l.substring(0, l.indexOf(':')).replaceFirst('{', ""),
+            number: map[l
+                .substring(0, l.indexOf(':'))
+                .toString()
+                .replaceFirst("{", "")
+                .trim()]));
+        s = s.substring(i + 1, s.length - 1);
+        i = s.indexOf(',');
+      } catch (e) {
+        break;
+      }
+    }
+    for (var a in attendence) {
+      print(a.week);
+      print(a.number);
+    }
+    return attendence;
   }
 }
