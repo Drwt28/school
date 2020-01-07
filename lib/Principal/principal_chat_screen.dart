@@ -8,8 +8,14 @@ class PrincipalChatScreen extends StatefulWidget {
 class _PrincipalChatScreenState extends State<PrincipalChatScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Center(child: Text('NO Chat Yet')),
+    return Scaffold(
+      body: Center(child: Text('NO Chat Yet')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
 }

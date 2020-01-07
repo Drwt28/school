@@ -4,13 +4,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_magna/Model/Database/db.dart';
+import 'package:school_magna/Notification/TeacherNotification.dart';
+import 'package:school_magna/Model/model.dart';
 import 'package:school_magna/Services/Student.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AttendencePage extends StatefulWidget {
   String tag;
 
-  AttendencePage(this.tag);
+  Map<dynamic, dynamic> map;
+
+  AttendencePage({@required this.map});
 
   @override
   _AttendencePageState createState() => _AttendencePageState();
@@ -19,6 +23,7 @@ class AttendencePage extends StatefulWidget {
 class _AttendencePageState extends State<AttendencePage> {
   var _db = DatabaseService();
 
+  var _notification = TeacherNotification();
   List<Student> students = [];
   Color selectColor = Colors.blue;
 
@@ -48,6 +53,7 @@ class _AttendencePageState extends State<AttendencePage> {
             body: CustomScrollView(
               slivers: <Widget>[
                 SliverAppBar(
+                  pinned: true,
                   primary: true,
                   expandedHeight:
                   MediaQuery
@@ -57,7 +63,10 @@ class _AttendencePageState extends State<AttendencePage> {
                   flexibleSpace: FlexibleSpaceBar(
                     centerTitle: true,
                     collapseMode: CollapseMode.parallax,
-                    title: Text('Attendence'),
+                    title: Text(
+                      'Attendence',
+                      style: TextStyle(color: Colors.black),
+                    ),
                     background: Center(
                       child: SizedBox(
                           height: 200, width: 200, child: buildTopBox()),
@@ -74,14 +83,27 @@ class _AttendencePageState extends State<AttendencePage> {
             ),
             persistentFooterButtons: <Widget>[
               SafeArea(
-                child: CupertinoButton(
+                  child: RaisedButton(
                     onPressed: () {
-                      updateAttendece(
-                          pref.getString('school'), query.data.documents);
+                      updateAttendece(pref.getString('school'),
+                          query.data.documents, user.email);
                     },
+                    textColor: Colors.white,
                     color: Colors.lightBlue,
-                    child: Text('Take Attendence')),
-              )
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Take Attendence'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(Icons.done_all),
+                        )
+                      ],
+                    ),
+                  ))
             ],
           )
               : CircularProgressIndicator();
@@ -185,118 +207,72 @@ class _AttendencePageState extends State<AttendencePage> {
 //  },
 //  )
 
-  updateAttendece(String id, List<DocumentSnapshot> snap) {
-    var db = Firestore.instance.collection('schools/$id/students');
+  updateAttendece(String schoolid, List<DocumentSnapshot> snap,
+      String classId) {
+    var db = Firestore.instance.collection('schools/$schoolid/students');
 
     for (var doc in snap) {
       var id = doc.documentID;
-      print(id);
+
+      var name = doc.data['name'];
 
       if (absentList.contains(id)) {
-        List list = doc.data['absentList'];
-
-        if (list == null) {
-          list = List();
-        }
-        list.add(Timestamp.now());
+        var list = new List<dynamic>.from(doc.data['absentList']);
+        list.add(DateTime.now());
 
         db.document(id).updateData({'absentList': list});
+        _notification.sendNotification(
+            "Attendence", '$name is absent in todays class ', id);
+
       } else if (presentList.contains(id)) {
-        List list = doc.data['presentList'];
-
-        try {
-          list.add(Timestamp.now());
-          list .add(Timestamp.now());
-        } catch (e) {
-          list = new List();
-          list.add(Timestamp.now());
-        }
-
+        var list = new List<dynamic>.from(doc.data['presentList']);
+        list.add(DateTime.now());
 
         db.document(id).updateData({'presentList': list});
       } else if (leaveList.contains(id)) {
-        List list = doc.data['leaveList'];
-
-        list.add(Timestamp.now());
+        var list = new List<dynamic>.from(doc.data['leaveList']);
+        list.add(DateTime.now());
 
         db.document(id).updateData({'leaveList': list});
       }
     }
-    print(absentList);
-  }
-}
+    CustomWidgets.getTimeFromString(DateTime.now());
 
-class AttendenceWidget extends StatefulWidget {
-  String rollNo, name;
+    Map<String, int> map = Map.from(widget.map);
 
-  String id;
+    map[CustomWidgets.getTimeFromString(DateTime.now())] =
+        presentList.length;
+    Firestore.instance
+        .document('schools/$schoolid/classes/$classId')
+        .updateData({
+      'attendenceList': map,
+      'presentStudents': presentList.length.toString()
+    })
+        .then((val) {
 
-  int click;
-
-  int index;
-
-  CallbackAction onpressed;
-
-  int onPressed(int val) {
-    this.click = val;
-  }
-
-  AttendenceWidget(
-      {this.rollNo, this.name, this.id, this.click, this.onpressed});
-
-  @override
-  _AttendenceWidgetState createState() => _AttendenceWidgetState();
-}
-
-class _AttendenceWidgetState extends State<AttendenceWidget> {
-  List<String> absentList = List(),
-      presentList = List(),
-      leaveList = List();
-  List<bool> triple = [false, false, false];
-  List<List<bool>> isSelected =
-  List.generate(200, (_) => [false, false, false]);
-  Color selectColor = Colors.blue;
-
-  Widget buildAttendence(String a) {
-    return Text(a, style: TextStyle(fontSize: 30));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text("\t" + widget.name),
-      trailing: ToggleButtons(
-        disabledColor: Colors.black12,
-        borderRadius: BorderRadius.circular(2),
-        selectedColor: selectColor,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(3.0),
-            child: buildAttendence("A"),
+    })
+        .catchError((error) {
+      print(error);
+    });
+    showDialog(
+        context: context,
+        child: AlertDialog(
+          title: Icon(
+            Icons.done_all,
+            color: Colors.greenAccent,
+            size: 50,
           ),
-          Padding(
-            padding: const EdgeInsets.all(3.0),
-            child: buildAttendence("P"),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(3.0),
-            child: buildAttendence('L'),
-          )
-        ],
-        onPressed: (int index) {
-          setState(() {
-            isSelected[widget.index][index] = true;
-            if (index == 0) {
-              absentList.add(widget.id);
-            } else if (index == 1) {
-              presentList.add(widget.id);
-            } else {
-              leaveList.add(widget.id);
-            }
-          });
-        },
-        isSelected: isSelected[widget.index],
-      ),
-    );
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          content: Text('Attendence taken succesfully'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('ok'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+        ));
   }
 }

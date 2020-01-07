@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -39,8 +40,8 @@ class CustomWidgets {
         ));
   }
 
-  static Widget studentHomePannel(BuildContext context, String tit,
-      String path, Color startColor, Color endColor) {
+  static Widget studentHomePannel(BuildContext context, String tit, String path,
+      Color startColor, Color endColor) {
     return AnimatedContainer(
         duration: Duration(seconds: 1),
         padding: EdgeInsets.all(4),
@@ -58,14 +59,14 @@ class CustomWidgets {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-
                 Flexible(
                   flex: 1,
                   child: Text(
                     tit,
                     style: TextStyle(fontSize: 26, color: Colors.white),
                   ),
-                ), Flexible(
+                ),
+                Flexible(
                   flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -80,9 +81,6 @@ class CustomWidgets {
         ));
   }
 
-
-
-
   static Widget teacherHomePannelCardHero(BuildContext context, String tit,
       String path, Color startColor, Color endColor, String tag) {
     return AnimatedContainer(
@@ -90,9 +88,8 @@ class CustomWidgets {
         padding: EdgeInsets.all(4),
         child: Card(
           elevation: 10,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10)
-          ),
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Container(
             height: MediaQuery
                 .of(context)
@@ -133,8 +130,8 @@ class CustomWidgets {
         ));
   }
 
-  static Widget teacherHomePannelCardHeroSingle(BuildContext context, String tit,
-      String path, Color startColor, Color endColor, String tag) {
+  static Widget teacherHomePannelCardHeroSingle(BuildContext context,
+      String tit, String path, Color startColor, Color endColor, String tag) {
     return AnimatedContainer(
         duration: Duration(seconds: 1),
         padding: EdgeInsets.all(4),
@@ -154,7 +151,8 @@ class CustomWidgets {
                   tit,
                   style: TextStyle(fontSize: 24, color: Colors.white),
                 ),
-              ),Flexible(
+              ),
+              Flexible(
                 flex: 1,
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
@@ -166,7 +164,6 @@ class CustomWidgets {
                   ),
                 ),
               ),
-
             ],
           ),
         ));
@@ -174,7 +171,7 @@ class CustomWidgets {
 
 //selection pannel card
   static Widget SelectionPannelCard(BuildContext context, String tit,
-      String path, Color startColor, Color endColor,tag) {
+      String path, Color startColor, Color endColor, tag) {
     return AnimatedContainer(
         duration: Duration(seconds: 1),
         padding: EdgeInsets.all(30),
@@ -210,7 +207,15 @@ class CustomWidgets {
 
   static String getTimeFromString(DateTime time) {
     var now = time;
-    var formatter = new DateFormat('yyyy-MM-dd');
+    var formatter = new DateFormat('dd-MM-yyyy');
+    String formatted = formatter.format(now);
+
+    return formatted;
+  }
+
+  static String getTime(Timestamp time) {
+    var now = DateTime.fromMillisecondsSinceEpoch(time.millisecondsSinceEpoch);
+    var formatter = new DateFormat('dd-MM-yyyy');
     String formatted = formatter.format(now);
 
     return formatted;
@@ -243,8 +248,13 @@ class CustomWidgets {
                       name,
                       style: TextStyle(fontSize: 24, color: Colors.white),
                     ),
-                    SizedBox(height: 10,),
-                    Text(address, style: TextStyle(color: Colors.white),)
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      address,
+                      style: TextStyle(color: Colors.white),
+                    )
                   ],
                 ),
               ),
@@ -255,12 +265,30 @@ class CustomWidgets {
                   child: CircleAvatar(
                     backgroundColor: Colors.white,
                     backgroundImage: NetworkImage(logo),
-
                   ),
                 ),
               ),
             ],
           ),
+        ));
+  }
+
+  static ShowDialog(BuildContext context, Widget icon, content) {
+    showDialog(
+        context: context,
+        child: AlertDialog(
+          title: icon,
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          content: content,
+          actions: <Widget>[
+            FlatButton(
+              child: Text('ok'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
         ));
   }
 }

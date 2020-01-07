@@ -145,6 +145,9 @@ class _StudentPanelState extends State<StudentPanel> {
       pref.setString('Student', snap.documents[0].documentID);
 
 
+      String id = snap.documents[0].data['classId'];
+      pref.setString('classId', id);
+      _notification.saveUserToken(id.substring(0, id.indexOf('@')));
       _notification.saveUserToken(s + f + m);
 
 

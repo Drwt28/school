@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_magna/Model/model.dart';
+import 'package:school_magna/Student/StudentInfo/Homework/detailHomeWorkPage.dart';
 import 'package:school_magna/Principal/principal_page.dart';
 import 'package:school_magna/Student/StudentInfo/student_home_page.dart';
 import 'package:school_magna/Student/studentHomeScreen.dart';
@@ -45,7 +46,7 @@ void main() {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           backgroundColor: Colors.white,
-          fontFamily: 'monsterat',
+
           appBarTheme: AppBarTheme(
               color: Colors.white,
               elevation: 0,
@@ -53,12 +54,13 @@ void main() {
                   title: TextStyle(
                       fontSize: 18,
                       color: Colors.black,
-                      fontFamily: 'monsterat')),
+                  )),
               iconTheme: IconThemeData(color: Colors.black),
               actionsIconTheme: IconThemeData(color: Colors.black)),
           buttonTheme: ButtonThemeData(
               buttonColor: Colors.blue, splashColor: Colors.indigo)),
       home: MyApp(),
+      title: 'School Magna',
     ),
   ));
 }
@@ -82,6 +84,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var pref = Provider.of<SharedPreferences>(context);
+
     return (pref.getString('Student') != null)
         ? StudentHome()
         : Scaffold(
@@ -145,7 +148,7 @@ class _MyAppState extends State<MyApp> {
           sharedPreferences
               .setString("school", documents[i]['id'])
               .then((bool val) {
-            Navigator.push(
+            Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                     builder: (context) => SelectionPanel(i)));

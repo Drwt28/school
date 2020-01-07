@@ -1,18 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Student {
   String rollNo, name, fName, mName, dateOfBirth;
   String id;
   String teacherId;
   String classId;
   DateTime lastAttendence;
-  List<DateTime> presentList, absentList, leaveList;
+  List<dynamic> presentList, absentList, leaveList;
   Map<String, dynamic> remark;
 
   List<dynamic> compulsorySubjectList, optionSubjectList;
   List<result> resultList;
 
 
-  Student(
-      this.rollNo,
+  Student(this.rollNo,
       this.name,
       this.fName,
       this.mName,
@@ -40,12 +41,12 @@ class Student {
         map['teacherId'],
         map['classId'],
         map['lastAttendence'],
-        map['presentList'],
-        map['absentList'],
-        map['leaveList'],
+        map['presentList'] ?? List<Timestamp>(),
+        map['absentList'] ?? List<Timestamp>(),
+        map['leaveList'] ?? List<Timestamp>(),
         map['remark'],
-        map['compulsorySubjectList'],
-        map['optioSubjectList'],
+        map['compulsorySubjectList'] ?? List<String>(),
+        map['optioSubjectList'] ?? List<String>(),
         map['resultList']);
   }
 

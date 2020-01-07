@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:school_magna/Notification/TeacherNotification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NoticePage extends StatefulWidget {
@@ -12,6 +13,9 @@ class NoticePage extends StatefulWidget {
 class _NoticePageState extends State<NoticePage> {
   var notice = TextEditingController();
   bool send = false;
+  var _notification = TeacherNotification();
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -107,11 +111,13 @@ class _NoticePageState extends State<NoticePage> {
 
       ref.updateData({'notice': noticeText})
           .then((val) {
-        print(noticeText);
+        var name = id.substring(0, id.indexOf("@"));
+        _notification.sendNotification(
+            'New Notice for $name', noticeText, name);
         setState(() {
           send = false;
           ShowDialog('Sent', 'notice succesfully sent to all Students',
-              Icon(Icons.check, color: Colors.green,));
+              Icon(Icons.check, color: Colors.green, size: 50,));
         });
       });
     }
@@ -123,6 +129,9 @@ class _NoticePageState extends State<NoticePage> {
   ShowDialog(String title, message, Icon i) {
     showDialog(context: context, child: AlertDialog(
 
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10)
+      ),
       title: i,
       content: Text(message),
       actions: <Widget>[

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:school_magna/Principal/CreateChatPage.dart';
 import 'package:school_magna/Principal/notices.dart';
 import 'package:school_magna/Principal/principal_chat_screen.dart';
 import 'package:school_magna/Principal/visual_data_screen.dart';
@@ -22,7 +23,7 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
   final List<Widget> _children = [
     Visualization(),
     Notices(),
-    PrincipalChatScreen(),
+    CreateChatListPage(),
   ];
 
   @override

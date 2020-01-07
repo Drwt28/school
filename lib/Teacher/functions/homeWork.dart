@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:school_magna/Services/Class.dart';
 import 'package:school_magna/Widgets/Homework.dart';
@@ -38,7 +37,6 @@ class _homeworkPageState extends State<homeworkPage> {
   List<String> homeWorkTextList = [];
 
 
-  List<Asset> images = List<Asset>();
   Future getImageCamera(int i) async {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
 
@@ -169,14 +167,14 @@ class _homeworkPageState extends State<homeworkPage> {
             children: <Widget>[
               IconButton(
                 onPressed: () {
-                  loadAssets();
+
                 },
                 icon: Icon(Icons.camera_enhance),
                 color: Colors.blue,
               ),
               IconButton(
                 onPressed: () {
-                  loadAssets();
+
                 },
                 icon: Icon(Icons.image),
                 color: Colors.blue,
@@ -258,37 +256,4 @@ class _homeworkPageState extends State<homeworkPage> {
     return url;
   }
 
-  Future<void> loadAssets() async {
-    List<Asset> resultList = List<Asset>();
-    String error = 'No Error Dectected';
-
-
-    try {
-      resultList = await MultiImagePicker.pickImages(
-        maxImages: 300,
-        selectedAssets: images,
-        enableCamera: true,
-        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
-        materialOptions: MaterialOptions(
-          actionBarColor: "#abcdef",
-          actionBarTitle: "Slect Homework ",
-          allViewTitle: "All Photos",
-          useDetailsView: false,
-          selectCircleStrokeColor: "#000000",
-        ),
-      );
-    } on Exception catch (e) {
-      error = e.toString();
-      print(error);
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      images = resultList;
-    });
-  }
 }

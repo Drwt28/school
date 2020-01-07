@@ -1,5 +1,6 @@
 class Class {
   String teacherName, className, section, classId, notice;
+  Map<dynamic, dynamic> attendeceData;
 
   Class(
       {this.teacherName,
@@ -12,7 +13,8 @@ class Class {
       this.lastAttendence,
       this.presentStudents,
       this.homeWorkList,
-      this.attendenceList});
+        this.attendenceList
+      });
 
   List<String> studentId;
 

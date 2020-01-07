@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:school_magna/Model/model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RemarkPage extends StatefulWidget {
@@ -10,6 +13,7 @@ class RemarkPage extends StatefulWidget {
 }
 
 class _RemarkPageState extends State<RemarkPage> {
+
   @override
   Widget build(BuildContext context) {
     var user = Provider.of<FirebaseUser>(context);
@@ -50,6 +54,7 @@ class _RemarkPageState extends State<RemarkPage> {
           ],
         ));
   }
+
   Widget buildTopBox() {
     return Hero(
       tag: 'remark',
@@ -60,32 +65,98 @@ class _RemarkPageState extends State<RemarkPage> {
   }
 
   buildRemarkList(List<DocumentSnapshot> documents) {
-    
     return ListView.builder(
-    itemCount: documents.length
-    ,itemBuilder: (context,index){
-      return buildRemarkItem(documents[index]['name'], index.toString()); 
-    });
-    
+        itemCount: documents.length,
+        itemBuilder: (context, index) {
+          return remarkItem(
+            name: documents[index]['name'],
+            roll: index.toString(),
+            id: documents[index]['id'],
+          );
+        });
   }
-  
-  buildRemarkItem(String name,rollno)
-  {
-    return ListTile(
-      title: Text(rollno + name),
+
+  buildRemarkItem(String name, rollno) {}
+}
+
+class remarkItem extends StatefulWidget {
+  String name, roll, id;
+
+  remarkItem({@required this.name, this.roll, this.id});
+
+  @override
+  _remarkItemState createState() => _remarkItemState();
+}
+
+class _remarkItemState extends State<remarkItem> {
+  bool send = false,
+      sending = false;
+  final _formKey = GlobalKey<FormState>();
+
+  TextEditingController _editingController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    var pref = Provider.of<SharedPreferences>(context);
+
+    String rollNo = widget.roll;
+    String name = widget.name;
+    String id = widget.id;
+
+    return send
+        ? ListTile(
+      title: Text('remark succesfully sent for $name'),
+      trailing: Icon(
+        Icons.done_all,
+        color: Colors.greenAccent,
+        size: 30,
+      ),
+    )
+        : ListTile(
+      title: Text(
+        rollNo + "\t" + name, style: TextStyle(color: Colors.indigo),),
       isThreeLine: true,
       contentPadding: EdgeInsets.all(5),
-      subtitle: TextField(decoration: InputDecoration(
-        labelText: 'enter remark '
-      ),),
-      
-      trailing: IconButton(
-        onPressed: (){
-
+      subtitle: TextFormField(
+        controller: _editingController,
+        validator: (val) {
+          if (val.isEmpty) {
+            return "enter remark";
+          }
+          return null;
+        },
+        decoration: InputDecoration(labelText: 'enter remark'),
+      ),
+      trailing: sending
+          ? CircularProgressIndicator()
+          : IconButton(
+        onPressed: () {
+          sendRemark(
+              pref.getString('school'), _editingController.text);
         },
         icon: Icon(Icons.send),
         color: Colors.blue,
       ),
     );
+  }
+
+  sendRemark(String schoolId, String remark) {
+    if (remark.isNotEmpty) {
+      setState(() {
+        sending = true;
+      });
+      String id = widget.id;
+      Firestore.instance
+          .document("schools/$schoolId/students/$id")
+          .updateData({'remark': remark}).then((val) {
+        setState(() {
+          send = true;
+          sending = false;
+        });
+      });
+    }
+    else {
+
+    }
   }
 }
