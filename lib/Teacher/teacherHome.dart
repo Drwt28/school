@@ -17,6 +17,7 @@ import 'package:school_magna/Teacher/functions/feesNotificationScreen.dart';
 import 'package:school_magna/Teacher/functions/homeWork.dart';
 import 'package:school_magna/Teacher/functions/remarkScreen.dart';
 import 'package:school_magna/Teacher/functions/studentListScreen.dart';
+import 'package:school_magna/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TeacherHomePage extends StatefulWidget {
@@ -118,7 +119,22 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
                                         ),
                                         ListTile(
                                           title: Text('Log Out'),
-                                          onTap: () {},
+                                          onTap: () async {
+                                            FirebaseAuth.instance.signOut()
+                                                .then((val) {
+                                              SharedPreferences.getInstance()
+                                                  .then((val) {
+                                                val.clear().then((val) {
+                                                  Navigator.pushReplacement(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              MyApp()
+                                                      ));
+                                                });
+                                              });
+                                            });
+                                          },
                                         )
                                       ],
                                     ),

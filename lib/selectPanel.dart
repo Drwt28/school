@@ -13,6 +13,9 @@ class SelectionPanel extends StatelessWidget {
 
   SelectionPanel(this.i);
 
+  Shader linearGradient = LinearGradient(
+    colors: <Color>[Colors.lightBlue, Colors.indigo],
+  ).createShader(Rect.fromLTWH(0.0, 0.0, 100, 10.0));
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +30,11 @@ class SelectionPanel extends StatelessWidget {
 
         title: Text(
           "Selection Panel",
-          style: TextStyle(color: Colors.blue),
+
+            style: TextStyle(fontSize: 27, foreground: Paint()
+              ..shader = linearGradient,)),
         ),
-      ),
+
       body: Container(
         margin: EdgeInsets.all(20.0),
         child: Center(

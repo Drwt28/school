@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_magna/Model/model.dart';
+import 'package:school_magna/SpalshScreen.dart';
 import 'package:school_magna/Student/StudentInfo/Homework/detailHomeWorkPage.dart';
 import 'package:school_magna/Principal/principal_page.dart';
 import 'package:school_magna/Student/StudentInfo/student_home_page.dart';
