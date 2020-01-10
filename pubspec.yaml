@@ -46,7 +46,7 @@ dependencies:
 
   cloud_firestore:
 
-  multi_image_picker: ^4.6.0
+
 
   awesome_package:
 

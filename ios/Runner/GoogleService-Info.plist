@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>598582799605-p02scgq5i34mha9jn15ml1mr1rfgb2pj.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.598582799605-p02scgq5i34mha9jn15ml1mr1rfgb2pj</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>598582799605-sg8qdr0vf35n5513l01flqicp4jakn3g.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDgGVKegReMqWDvtZM10Sz80QM6OmiaWWU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>598582799605</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>Magna</string>
+	<key>PROJECT_ID</key>
+	<string>schoolmagnatest</string>
+	<key>STORAGE_BUCKET</key>
+	<string>schoolmagnatest.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:598582799605:ios:80d0bf0586f0cee20569bc</string>
+	<key>DATABASE_URL</key>
+	<string>https://schoolmagnatest.firebaseio.com</string>
+</dict>
+</plist>
