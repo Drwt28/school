@@ -62,28 +62,26 @@ class _classBuilderScreenState extends State<classBuilderScreen> {
         centerTitle: true,
       ),
       body: Column(
+        mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          Flexible(
-            child: Text(
-              "",
-              style: TextStyle(color: Colors.black, fontSize: 20),
-            ),
+          Text(
+            "",
+            style: TextStyle(color: Colors.black, fontSize: 20),
           ),
           TextField(
             textInputAction: TextInputAction.done,
             controller: tName,
             decoration: InputDecoration(labelText: 'Tecaher name'),
           ),
-          Flexible(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                buildClassDropDown(context),
-                buildSectionSelection(context)
-              ],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              buildClassDropDown(context),
+              buildSectionSelection(context)
+            ],
           ),
-          Flexible(
+          Expanded(
+              flex: 1,
               child: StreamBuilder<DocumentSnapshot>(
                 stream: Firestore.instance
                     .collection('schools')
@@ -96,27 +94,30 @@ class _classBuilderScreenState extends State<classBuilderScreen> {
                       context, snapshot.data.data['subjectList']);
                 },
               )),
-          Container(
-            child: dec
-                ? RaisedButton(
-              child: Text(
-                'done',
-                style: TextStyle(fontSize: 16),
-              ),
-              onPressed: () {
-                setState(() {
-                  dec = false;
-                });
 
-                uploadData(user.email, tName.text, subList, className,
-                    sectioName, pref.getString('school'));
-              },
-            )
-                : CircularProgressIndicator(),
-          ),
         ],
       ),
-    ):Scaffold(body : Center(child: CircularProgressIndicator()));
+      persistentFooterButtons: <Widget>[
+        Container(
+          child: dec
+              ? RaisedButton(
+            child: Text(
+              'done',
+              style: TextStyle(fontSize: 16),
+            ),
+            onPressed: () {
+              setState(() {
+                dec = false;
+              });
+
+              uploadData(user.email, tName.text, subList, className,
+                  sectioName, pref.getString('school'));
+            },
+          )
+              : CircularProgressIndicator(),
+        ),
+      ],) : Scaffold(body: Center(child: CircularProgressIndicator())
+    );
   }
 
 

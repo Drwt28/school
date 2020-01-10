@@ -147,6 +147,10 @@ class _StudentPanelState extends State<StudentPanel> {
 
       String id = snap.documents[0].data['classId'];
       pref.setString('classId', id);
+      List<String> list = List.castFrom(
+          snap.documents[0].data['compulsorySubjectList']);
+
+      pref.setStringList('subjects', list);
       _notification.saveUserToken(id.substring(0, id.indexOf('@')));
       _notification.saveUserToken(s + f + m);
 

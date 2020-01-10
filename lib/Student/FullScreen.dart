@@ -7,7 +7,7 @@ class FullScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: Text('Homework'),),
       body: Hero(
         tag: tag,
         child: PhotoView(

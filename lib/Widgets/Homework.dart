@@ -44,7 +44,6 @@ class _HomeworkTileState extends State<HomeworkTile> {
 
     var pref = Provider.of<SharedPreferences>(context);
 
-
     return (sent)
         ? sentCard(widget.subjectName)
         : Card(
@@ -127,8 +126,7 @@ class _HomeworkTileState extends State<HomeworkTile> {
                 onPressed: () {
                   if (imageFile == null || progress) {
                     uploadImageStorage(
-                        widget.subjectName
-                        ,
+                        widget.subjectName,
                         1,
                         imageFile,
                         user.email,
@@ -172,16 +170,20 @@ class _HomeworkTileState extends State<HomeworkTile> {
   }
 
   Future<String> uploadImageStorage(String subjectName, int j, var imageFile,
-      String name,
-      String text, FirebaseUser user, String schoolId) async {
+      String name, String text, FirebaseUser user, String schoolId) async {
     List<String> urlList = List<String>();
     String t = text;
+
+    var pref = Provider.of<SharedPreferences>(context);
 
     final FirebaseStorage storage = FirebaseStorage.instance;
 
     DateTime date = DateTime.now();
-    StorageReference ref =
-    storage.ref().child(name + widget.days[date.weekday - 1]);
+    StorageReference ref = storage
+        .ref()
+        .child(pref.getString('school'))
+        .child(user.email)
+        .child(widget.subjectName + widget.days[date.weekday - 1]);
 
     StorageUploadTask uploadTask = ref.putFile(imageFile);
 
@@ -207,15 +209,13 @@ class _HomeworkTileState extends State<HomeworkTile> {
     DateTime date = DateTime.now();
 
     homework['day'] = widget.days[date.weekday];
-    String day = widget.days[date.weekday].toLowerCase();
-    DocumentReference doc = Firestore.instance
-        .document('schools/$schoolId/classes/$id');
-
+    String day = widget.days[date.weekday - 1].toLowerCase();
+    DocumentReference doc =
+    Firestore.instance.document('schools/$schoolId/classes/$id');
 
     List list = List();
 
     list.add(url);
-
 
     homework['image'] = list ?? List();
 
@@ -224,7 +224,6 @@ class _HomeworkTileState extends State<HomeworkTile> {
     homework['text'] = t;
 
     homework['day'] = day;
-
 
     homework['name'] = subjectName;
 
@@ -273,5 +272,4 @@ class _HomeworkTileState extends State<HomeworkTile> {
           )),
     );
   }
-
 }

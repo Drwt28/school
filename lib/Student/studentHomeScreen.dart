@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:school_magna/Student/StudentInfo/Homework/detailHomeWorkPage.dart';
 import 'package:school_magna/Student/StudentInfo/attendent_page.dart';
 import 'package:school_magna/Student/StudentInfo/result_page.dart';
@@ -17,10 +19,11 @@ class _StudentHomeState extends State<StudentHome> {
   ScrollController listViewController = ScrollController();
   String title = "title";
   int _currentIndex = 0;
+  static List subjectList = [];
   final List<Widget> _children = [
     HomePage(),
     AttendentPage(),
-    DetailHomeWorkPage(list: ['Hindi', 'English'],),
+    DetailHomeWorkPage(list: subjectList),
     ResultPage(),
 
   ];
@@ -32,11 +35,33 @@ class _StudentHomeState extends State<StudentHome> {
     'Result'
   ];
 
+
+  Future<DocumentSnapshot> getStudentData() async {
+    var pref = Provider.of<SharedPreferences>(context);
+
+    String id = pref.getString('Student');
+    String schoolId = pref.getString('school');
+
+    DocumentSnapshot snapshot = await Firestore.instance.document(
+        'schools/$schoolId/students/$id').get();
+
+    setState(() {
+      subjectList = snapshot.data['compulsorySubjectList'];
+    });
+    return snapshot;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
 
-      body: buildHomePage(),
+
+        body: FutureBuilder<DocumentSnapshot>(
+          builder: (context, snap) => buildHomePage(snap.data),
+          future: getStudentData(),
+
+        )
+
 
 //      body: _children[_currentIndex],
 //      bottomNavigationBar: BottomNavigationBar(
@@ -73,8 +98,10 @@ class _StudentHomeState extends State<StudentHome> {
     });
   }
 
-  buildHomePage() {
+  buildHomePage(DocumentSnapshot snapshot) {
     return Column(
+
+
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
 

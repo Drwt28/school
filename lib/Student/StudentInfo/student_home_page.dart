@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import 'package:school_magna/Student/StudentChatPage.dart';
 import 'package:school_magna/Teacher/TeacherChatPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -119,7 +121,8 @@ class _HomePageState extends State<HomePage> {
                         ), title: Text('Chat With Class Teacher'),
                         subtitle: Text('tap to see remarks'),
                         onTap: () {
-
+                          createChatDocument(snapshot.data.data['name'],
+                              snapshot.data.documentID, id, schoolId);
                         },
                       ),
                     ),
@@ -326,4 +329,29 @@ class _HomePageState extends State<HomePage> {
 
     return snap;
   }
+
+  void createChatDocument(String name,
+      String documentID, String id, String schoolId) {
+    String id = documentID;
+    DocumentReference ref =
+    Firestore.instance.document('schools/$schoolId/chat/$documentID');
+    print(documentID);
+    print(id);
+
+
+    List<String> users = [id, documentID];
+
+    ref
+        .setData(({'users': users, 'count': 0}))
+        .then((val) => print('done'))
+        .then((val) {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => StudentChatScreen(classId: name, id: id)));
+    });
+  }
+
+
+
 }

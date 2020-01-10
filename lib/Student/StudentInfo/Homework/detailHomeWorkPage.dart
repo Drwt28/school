@@ -6,12 +6,14 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
 import 'package:school_magna/Model/model.dart';
 import 'package:school_magna/Services/Class.dart';
+import 'package:school_magna/Student/FullScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailHomeWorkPage extends StatefulWidget {
-  List<String> list;
+  List list;
 
   DetailHomeWorkPage({@required this.list});
+
 
   @override
   _DetailHomeWorkPageState createState() => _DetailHomeWorkPageState();
@@ -37,7 +39,10 @@ class _DetailHomeWorkPageState extends State<DetailHomeWorkPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.list);
     var pref = Provider.of<SharedPreferences>(context);
+
+    List subjectList = pref.getStringList('subjects');
 
     String id = pref.getString('Student');
     String schoolId = pref.getString('school');
@@ -48,15 +53,15 @@ class _DetailHomeWorkPageState extends State<DetailHomeWorkPage> {
             .snapshots(),
         builder: (context, snapshot) {
           return Scaffold(
-            body: ListView.builder(
+            body: snapshot.hasData ? ListView.builder(
               scrollDirection: Axis.vertical,
-              itemCount: widget.list.length,
+              itemCount: subjectList.length,
               controller: controller,
               itemBuilder: (context, i) =>
-                  (snapshot.data.data[widget.list[i]] != null)
-                      ? buildHomeworkPages(snapshot.data.data[widget.list[i]])
-                      : Center(child: CircularProgressIndicator()),
-            ),
+              (snapshot.data.data[subjectList[i]] != null)
+                  ? buildHomeworkPages(snapshot.data.data[subjectList[i]])
+                  : SizedBox(),
+            ) : Center(child: CircularProgressIndicator()),
           );
         });
   }
@@ -132,10 +137,16 @@ class _DetailHomeWorkPageState extends State<DetailHomeWorkPage> {
               SizedBox(
                 height: 200,
                 width: MediaQuery.of(context).size.width * .9,
-                child: Image(
-                  fit: BoxFit.fitWidth,
-                  width: MediaQuery.of(context).size.width * .9,
-                  image: NetworkImage(h.images[0]),
+                child: Hero(
+                  tag: h.subject,
+                  child: Image(
+                    fit: BoxFit.fitWidth,
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width * .9,
+                    image: NetworkImage(h.images[0]),
+                  ),
                 ),
               ),
               SizedBox(
@@ -148,7 +159,13 @@ class _DetailHomeWorkPageState extends State<DetailHomeWorkPage> {
             ],
           ),
         ),
-        onTap: () {},
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(
+              builder: (context) =>
+                  FullScreen(image: h.images[0],
+                    tag: h.subject,)
+          ));
+        },
       ),
     );
   }

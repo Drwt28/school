@@ -30,7 +30,8 @@ class _AttendentPageState extends State<AttendentPage> {
               .document('schools/$schoolId/students/$id')
               .snapshots(),
           builder: (context, snapshot) {
-            return Padding(
+            return !snapshot.hasData ? Center(
+                child: CircularProgressIndicator()) : Padding(
               padding: const EdgeInsets.all(8.0),
               child: SafeArea(
                 child: ListView(
@@ -231,8 +232,8 @@ class _AttendentPageState extends State<AttendentPage> {
       markedDatesMap: markeddateMap,
       showOnlyCurrentMonthDate: false,
       markedDateShowIcon: true,
-      markedDateCustomTextStyle: TextStyle(color: Colors.white),
-      todayButtonColor: Colors.white,
+      todayTextStyle: TextStyle(color: Colors.black),
+      todayButtonColor: Colors.transparent,
       markedDateIconMaxShown: 1,
       markedDateMoreShowTotal: null,
       markedDateIconBuilder: (Event event) {
