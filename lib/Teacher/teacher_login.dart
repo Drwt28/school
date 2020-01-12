@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_magna/Model/model.dart';
+import 'package:school_magna/Notification/Notification.dart';
+import 'package:school_magna/Services/Student.dart';
 import 'package:school_magna/Teacher/classBuilderScreen.dart';
 import 'package:school_magna/Teacher/teacherHome.dart';
 import 'package:school_magna/Principal/principal_page.dart';
@@ -19,6 +21,9 @@ class _teacher_loginState extends State<teacher_login> {
   bool dec = false;
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
+  NoticationService _noticationService = NoticationService();
+
+  FirebaseAuth _auth;
 
   String _e, _p;
   String designation;
@@ -26,17 +31,15 @@ class _teacher_loginState extends State<teacher_login> {
   @override
   initState() {
     super.initState();
-    checkForSignIn();
+
+    _auth = FirebaseAuth.instance;
+
+    //   checkForSignIn();
   }
 
-  Future checkForSignIn() async {
-    user = await FirebaseAuth.instance.currentUser();
-
-    if (user != null) {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => classBuilderScreen()));
-    }
-  }
+  Shader linearGradient = LinearGradient(
+    colors: <Color>[Colors.lightBlue, Colors.indigo],
+  ).createShader(Rect.fromLTWH(0.0, 0.0, 100, 10.0));
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +47,34 @@ class _teacher_loginState extends State<teacher_login> {
     var pref = Provider.of<SharedPreferences>(context);
 
     String id = pref.getString('school');
+
+    String title = id.substring(0, id.indexOf("@")).toUpperCase();
     bool show = true;
 
     return StreamBuilder<DocumentSnapshot>(
         stream: Firestore.instance.document('schools/$id').snapshots(),
         builder: (context, snapshot) {
           return Scaffold(
+            appBar: AppBar(
+              actions: <Widget>[
+                IconButton(
+                    icon: Icon(Icons.info, color: Colors.indigo),
+                    onPressed: () {}
+
+                  //show help Dialog
+
+                )
+              ],
+              elevation: 0,
+              backgroundColor: Colors.white,
+              title: Text(title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 27,
+                    foreground: Paint()
+                      ..shader = linearGradient,
+                  )),
+            ),
             floatingActionButton: FloatingActionButton(
               child: Icon(Icons.clear),
               backgroundColor: !dec ? Colors.white : Colors.blue,
@@ -58,7 +83,8 @@ class _teacher_loginState extends State<teacher_login> {
                   dec = false;
                 });
               },
-              elevation: 0,),
+              elevation: 0,
+            ),
             backgroundColor: Colors.white,
             body: SafeArea(
               child: Column(
@@ -74,144 +100,69 @@ class _teacher_loginState extends State<teacher_login> {
                         .width * 0.85,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          TextFormField(
-                            onSaved: (val) {
-                              _e = val;
-                            },
-                            controller: email,
-                            style: TextStyle(fontSize: 18),
-                            obscureText: false,
-                            decoration: InputDecoration(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            TextFormField(
+                              controller: email,
+                              style: TextStyle(fontSize: 18),
+                              obscureText: false,
+                              decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderRadius:
                                     BorderRadius.circular(20)),
-                                labelText: 'teacher id',
-                                icon: Icon(Icons.email)),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          TextFormField(
-                            onSaved: (val) {
-                              _p = val;
-                            },
-                            onChanged: (val) {
-                              setState(() {
-                                _p = val;
-                              });
-                            },
-                            controller: password,
-                            obscureText: dec,
-                            enableInteractiveSelection: true,
-                            style: TextStyle(fontSize: 18),
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(20)),
-                                labelText: 'password',
-                                icon: Icon(Icons.security)),
-                          ),
-                          SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              child: buildClassDropDown(context),
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          dec
-                              ? CircularProgressIndicator()
-                              : Container(
-                            width:
-                            MediaQuery
-                                .of(context)
-                                .size
-                                .width *
-                                0.5,
-                            child: CupertinoButton(
-                              color: Colors.blue,
-                              child: Text(
-                                'Login',
-                                style: TextStyle(fontSize: 16),
+                                labelText: 'Login Id',
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  dec = true;
-                                });
-
-                                if (designation == null) {
-                                  showDialog(
-                                      context: context,
-                                      child: AlertDialog(
-                                        title: Icon(
-                                          Icons.warning,
-                                          color: Colors.yellow,
-                                        ),
-                                        content: Text(
-                                          'select your Designation for login',
-                                          style: TextStyle(
-                                              fontSize: 17),
-                                        ),
-                                        actions: <Widget>[
-                                          FlatButton(
-                                            onPressed: () {
-                                              Navigator.pop(
-                                                  context);
-                                              setState(() {
-                                                dec = false;
-                                              });
-                                            },
-                                            child: Text('OK'),
-                                            color: Colors.blue,
-                                            textColor: Colors.white,
-                                          )
-                                        ],
-                                      ));
-                                } else if (designation ==
-                                    'Principal') {
-                                  if (email.text.trim() ==
-                                      snapshot
-                                          .data.data['id'] &&
-                                      password.text.trim() ==
-                                          snapshot.data
-                                              .data['password']) {
-                                    pref
-                                        .setString('principal',
-                                        email.text.trim())
-                                        .then((val) {
-                                      Navigator.of(context)
-                                          .pushReplacement(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PrincipalHomeScreen()));
-                                    });
-                                  } else {
-                                    print(
-                                        email.text + password.text);
-                                    setState(() {
-                                      dec = false;
-                                    });
-                                  }
-                                } else {
-                                  try {
-                                    Signin(
-                                        email.text.trim(),
-                                        password.text.trim(),
-                                        pref,
-                                        context);
-                                  } catch (error) {
-                                    setState(() {
-                                      dec = false;
-                                    });
-                                  }
-                                }
-                              },
                             ),
-                          )
-                        ],
+                            SizedBox(
+                              height: 20,
+                            ),
+                            TextFormField(
+                              controller: password,
+                              obscureText: dec,
+                              enableInteractiveSelection: true,
+                              style: TextStyle(fontSize: 18),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.circular(20)),
+                                labelText: 'Password',
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                child: buildClassDropDown(context),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            dec
+                                ? CircularProgressIndicator()
+                                : Container(
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width *
+                                  0.5,
+                              child: CupertinoButton(
+                                color: Colors.blue,
+                                child: Text(
+                                  'Login',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                onPressed: () {
+                                  SignIn(
+                                      snapshot.data.data['id'],
+                                      snapshot
+                                          .data.data['password']);
+                                },
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   )
@@ -242,8 +193,8 @@ class _teacher_loginState extends State<teacher_login> {
           ),
           iconSize: 28,
           hint: Text(
-            "select your designation ",
-            style: TextStyle(color: Colors.blue, fontSize: 16),
+            "Select Your Designation ",
+            style: TextStyle(color: Colors.black54, fontSize: 16),
           ),
           elevation: 16,
           style: TextStyle(color: Colors.indigo),
@@ -269,50 +220,108 @@ class _teacher_loginState extends State<teacher_login> {
         ));
   }
 
-  Signin(String id, pass, SharedPreferences pref, BuildContext context) {
-    try {
-      FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-          email: email.text.trim(), password: password.text.trim())
-          .then((AuthResult result) {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => classBuilderScreen()));
-      });
-    } catch (error) {
-      showDialog(
-          context: context,
-          child: AlertDialog(
-            title: Icon(
-              Icons.warning,
-              color: Colors.yellow,
-              size: 100,
-            ),
-            content: Text(
-              'Check your Id and password',
-              style: TextStyle(fontSize: 17),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    dec = false;
-                  });
-                },
-                child: Text('OK'),
-                color: Colors.blue,
-                textColor: Colors.white,
-              )
-            ],
-          ));
+  SignIn(String principalId, String pass) async {
+    var pref = Provider.of<SharedPreferences>(context);
+    setState(() {
+      dec = true;
+    });
+    principalId.trim();
+    pass.trim();
+    if (email.text.isNotEmpty && password.text.isNotEmpty) {
+      if (designation == null) {
+        showDialog(
+            context: context, child: getAlertDialog('Select Designation'));
+        setState(() {
+          dec = false;
+        });
+      } else {
+        if (designation == "Principal") {
+          if (principalId.toLowerCase() == email.text.trim().toLowerCase() &&
+              pass.toLowerCase() == password.text.trim().toLowerCase()) {
+            pref.setString('Principal', principalId.trim().toLowerCase()).then((
+                val) {
+              _noticationService.saveUserToken(
+                  principalId.substring(0, principalId.indexOf("@")));
+              Navigator.pushReplacement(
+                  context,
+                  CupertinoPageRoute(
+                      builder: (context) => PrincipalHomeScreen()));
+            });
+          } else {
+            setState(() {
+              dec = false;
+            });
+            showDialog(
+                context: context,
+                useRootNavigator: true,
+                child:
+                getAlertDialog('Enter Correct Principal Id and Password'));
+          }
+        }
+        if (designation == 'Teacher') {
+          _auth
+              .signInWithEmailAndPassword(
+              email: email.text, password: password.text)
+              .then((val) {
+            String topic =
+                "N" + email.text.substring(0, email.text.indexOf("@"));
+            _noticationService.saveUserToken(topic);
+
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => TeacherHomePage()));
+          }).catchError((error) {
+            setState(() {
+              dec = false;
+            });
+
+            showDialog(
+                context: context,
+                child: getAlertDialog('Enter Correct Teacher Id and Password'));
+          });
+        }
+      }
+    } else {
       setState(() {
         dec = false;
       });
+      showDialog(
+          context: context,
+          child: getAlertDialog('Enter login Id and Password for login'),
+          useRootNavigator: true);
     }
   }
 
   void principleSignIn(String id, pass) {
     Navigator.pushReplacement(context,
         MaterialPageRoute(builder: (context) => PrincipalHomeScreen()));
+  }
+
+  getAlertDialog(String mes) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      title: Icon(
+        Icons.warning,
+        size: 60,
+        color: Colors.yellow,
+      ),
+      content: Text(
+        mes,
+        style: TextStyle(fontSize: 17),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () {
+            Navigator.pop(context);
+            setState(() {
+              dec = false;
+            });
+          },
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: Text('OK'),
+          color: Colors.blue,
+          textColor: Colors.white,
+        )
+      ],
+    );
   }
 }

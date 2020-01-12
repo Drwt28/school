@@ -36,17 +36,15 @@ dependencies:
 
   provider: ^3.2.0
 
-  image_picker: ^0.6.2+3
+  image_picker:
 
-  expandable: ^4.0.1
+  expandable:
 
   flutter_calendar_carousel: ^1.4.10
 
   shared_preferences:
 
   cloud_firestore:
-
-  multi_image_picker: ^4.6.0
 
   awesome_package:
 

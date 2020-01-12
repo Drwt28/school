@@ -53,8 +53,8 @@ void main() {
               elevation: 0,
               textTheme: TextTheme(
                   title: TextStyle(
-                      fontSize: 18,
-                      color: Colors.black,
+                    fontSize: 18,
+                    color: Colors.black,
                   )),
               iconTheme: IconThemeData(color: Colors.black),
               actionsIconTheme: IconThemeData(color: Colors.black)),
@@ -80,63 +80,18 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    checkForLogin();
   }
+
 
   @override
   Widget build(BuildContext context) {
     var pref = Provider.of<SharedPreferences>(context);
 
-    return (pref.getString('Student') != null)
-        ? StudentHome()
-        : Scaffold(
-      body: Center(
-        child: StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance.collection("schools").snapshots(),
-            builder: (context, snapshots) =>
-            (snapshots.hasData)
-                ? CustomScrollView(
-              slivers: <Widget>[
-                SliverAppBar(
-                  actions: <Widget>[
-                    IconButton(icon: Icon(Icons.search, color: Colors.white)
-
-                      , onPressed: () {
-
-                      },)
-                  ],
-                  floating: true,
-                  expandedHeight:
-                  MediaQuery
-                      .of(context)
-                      .size
-                      .height * 0.34,
-                  flexibleSpace: FlexibleSpaceBar(
-                    centerTitle: true,
-                    collapseMode: CollapseMode.pin,
-                    title: Text(
-                      'Select Your School',
-                    ),
-                    background: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(50),
-                              bottomRight: Radius.circular(50))),
-                    ),
-                  ),
-
-                ),
-                SliverList(
-                  delegate:
-                  SliverChildBuilderDelegate((context, i) {
-                    return buildSchoolListcard(i,
-                        snapshots.data.documents);
-                  }, childCount: snapshots.data.documents.length),
-                )
-              ],
-            )
-                : CircularProgressIndicator()),
-      ),
+    return WillPopScope(
+        onWillPop: _onWillPop,
+        child: buildPage()
     );
   }
 
@@ -149,7 +104,7 @@ class _MyAppState extends State<MyApp> {
           sharedPreferences
               .setString("school", documents[i]['id'])
               .then((bool val) {
-            Navigator.pushReplacement(
+            Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => SelectionPanel(i)));
@@ -163,5 +118,101 @@ class _MyAppState extends State<MyApp> {
             Colors.blue,
             Colors.indigo,
             i));
+  }
+
+  void checkForLogin() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    var user = await auth.currentUser();
+
+    if (user != null) {
+      Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) => TeacherHomePage()
+      ));
+    }
+  }
+
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+      context: context,
+      builder: (context) =>
+      new AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        title: new Text('Are you sure?'),
+        content: new Text('Do you want to exit an App'),
+        actions: <Widget>[
+          new FlatButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: new Text('No'),
+          ),
+          new FlatButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: new Text('Yes'),
+          ),
+        ],
+      ),
+    )) ?? false;
+  }
+
+  Widget buildPage() {
+    var pref = Provider.of<SharedPreferences>(context);
+
+    if (pref.getString('Student') != null) {
+      return StudentHome();
+    }
+    else if (pref.getString('Principal') != null) {
+      return PrincipalHomeScreen();
+    }
+    else {
+      return Scaffold(
+        body: Center(
+          child: StreamBuilder<QuerySnapshot>(
+              stream: Firestore.instance.collection("schools").snapshots(),
+              builder: (context, snapshots) =>
+              (snapshots.hasData)
+                  ? CustomScrollView(
+                slivers: <Widget>[
+                  SliverAppBar(
+                    actions: <Widget>[
+                      IconButton(icon: Icon(Icons.search, color: Colors.white)
+
+                        , onPressed: () {
+
+                        },)
+                    ],
+                    floating: true,
+                    expandedHeight:
+                    MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.34,
+                    flexibleSpace: FlexibleSpaceBar(
+                      centerTitle: true,
+                      collapseMode: CollapseMode.pin,
+                      title: Text(
+                        'Select Your School',
+                      ),
+                      background: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(50),
+                                bottomRight: Radius.circular(50))),
+                      ),
+                    ),
+
+                  ),
+                  SliverList(
+                    delegate:
+                    SliverChildBuilderDelegate((context, i) {
+                      return buildSchoolListcard(i,
+                          snapshots.data.documents);
+                    }, childCount: snapshots.data.documents.length),
+                  )
+                ],
+              )
+                  : CircularProgressIndicator()),
+        ),
+      );
+    }
   }
 }

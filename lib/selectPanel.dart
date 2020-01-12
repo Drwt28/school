@@ -20,54 +20,73 @@ class SelectionPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var sharedPreferences = Provider.of<SharedPreferences>(context);
-    print(sharedPreferences.get("school"));
 
+    String id = sharedPreferences.getString('school') ?? '';
+
+    id = id.substring(0, id.indexOf("@")).toUpperCase();
 
     return Scaffold(
       appBar: AppBar(
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.info, color: Colors.indigo),
+              onPressed: () {}
+
+            //show help Dialog
+
+          )
+        ],
         elevation: 0,
         backgroundColor: Colors.white,
 
         title: Text(
-          "Selection Panel",
+            id,
 
-            style: TextStyle(fontSize: 27, foreground: Paint()
+            style: TextStyle(
+              fontWeight: FontWeight.w700, fontSize: 27, foreground: Paint()
               ..shader = linearGradient,)),
         ),
 
       body: Container(
-        margin: EdgeInsets.all(20.0),
+        color: Colors.white,
+        padding: EdgeInsets.all(20),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(
+              Flexible(
+                flex: 1,
+                child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => StudentPanel()));
+                    },
+                    child: CustomWidgets.SelectionPannelCard(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => StudentPanel()));
-                  },
-                  child: CustomWidgets.SelectionPannelCard(
-                      context,
-                      "Parents",
-                      'assets/parent/parents.png',
-                      Colors.indigoAccent,
-                      Colors.indigo,'parents')),
-              GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(
+                        "Parents",
+                        'assets/parent/parents.png',
+                        Colors.indigoAccent,
+                        Colors.indigo, 'parents')),
+              ),
+              Flexible(
+                flex: 1,
+                child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => teacher_login()));
+                    },
+                    child: CustomWidgets.SelectionPannelCard(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => teacher_login()));
-                  },
-                  child: CustomWidgets.SelectionPannelCard(
-                      context,
-                      "Teacher",
-                      'assets/teacher/teacher.png',
-                      Colors.lightBlue,
-                      Colors.blueAccent,'teacher'))
+                        "Teacher",
+                        'assets/teacher/teacher.png',
+                        Colors.lightBlue,
+                        Colors.blueAccent, 'teacher')),
+              )
             ],
           ),
         ),

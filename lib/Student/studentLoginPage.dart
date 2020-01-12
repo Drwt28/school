@@ -94,23 +94,22 @@ class _StudentPanelState extends State<StudentPanel> {
                         )),
                   ),
                   SizedBox(height: 20,),
-                  CupertinoButton(
+                  dec
+                      ? Center(child: CircularProgressIndicator(),)
+                      : CupertinoButton(
                     color: Colors.indigo,
                     onPressed: () {
-                      try {
+                      if (_formKey.currentState.validate()) {
+                        setState(() {
+                          dec = true;
+                        });
                         signIn(Sname.text.toLowerCase().trim(), Fname.text
                             .toLowerCase().trim(), Mname.text.toLowerCase()
                             .trim(),
                             pref.getString('school'), pref);
-                      } catch (error) {
-                        print(error.toString());
                       }
-                      if (_formKey.currentState.validate()) {
 
 
-                      } else {
-
-                      }
                     },
                     child: Text('Sign In'),
                   ),
@@ -160,9 +159,44 @@ class _StudentPanelState extends State<StudentPanel> {
       ));
     }
     else {
-      print("Error no students were found");
-//      _formKey.currentState.initState();
-//      _formKey.currentState.validate();
+      setState(() {
+        dec = false;
+      });
+
+      showDialog(context: context,
+          builder: (context) =>
+              getAlertDialog('Enter Correct Details Of Student'));
+
     }
   }
+
+  getAlertDialog(String mes) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      title: Icon(
+        Icons.warning,
+        size: 60,
+        color: Colors.yellow,
+      ),
+      content: Text(
+        mes,
+        style: TextStyle(fontSize: 17),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () {
+            Navigator.pop(context);
+            setState(() {
+              dec = false;
+            });
+          },
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: Text('OK'),
+          color: Colors.blue,
+          textColor: Colors.white,
+        )
+      ],
+    );
+  }
+
 }
